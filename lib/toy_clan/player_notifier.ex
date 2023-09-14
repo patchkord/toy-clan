@@ -4,8 +4,8 @@ defmodule ToyClan.PlayerNotifier do
   alias ToyClan
   alias ToyClan.Clan
 
-  @callback invate(Clan.player_id(), Clan.clan_id()) :: any()
-  # @callback decline(Clan.player_id()) :: any()
+  @callback message(Clan.player_id(), any()) :: any()
+  @callback invitation_request(Clan.player_id(), Clan.clan_name(), Clan.leader_id()) :: any()
 
   @spec publish(Clan.player_id, Clan.player_event) :: :ok
   def publish(player_id, player_event), do:
@@ -13,7 +13,7 @@ defmodule ToyClan.PlayerNotifier do
 
   @doc false
   def start_link(player), do:
-    GenServer.start_link( __MODULE__, player, name: service_name(player.id))
+    GenServer.start_link(__MODULE__, player, name: service_name(player.id))
 
   @doc false
   def init(player), do:
@@ -30,11 +30,9 @@ defmodule ToyClan.PlayerNotifier do
   def service_name(player_id), do:
     ToyClan.service_name({__MODULE__, player_id})
 
-  defp decode_event(:wellcome), do:
-    {:wellcome, []}
-  defp decode_event({:decline, clan_id}), do:
-    {:invate, [clan_id]}
-  # defp decode_event(:decline), do:
-  #   {:decline, []}
+  defp decode_event({:message, data}), do:
+    {:message, [data]}
+  defp decode_event({:invitation_request, clan_name, leader_id}), do:
+    {:invitation_request, [clan_name, leader_id]}
 
-end
+ end
