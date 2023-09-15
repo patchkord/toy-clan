@@ -102,7 +102,7 @@ defmodule Demo.AutoPlayer.Manager do
   def handle_call({:players_list, player_id, data}, from, state) do
     GenServer.reply(from, :ok)
     IO.puts("#{player_id}: players_list - #{data |> inspect()} ")
-    IO.puts("#{player_id}: going to kick of someone from ... ")
+    IO.puts("#{player_id}: going to kick someone of ... ")
 
     case data do
       [] ->
