@@ -5,7 +5,10 @@ defmodule ToyClan.PlayerNotifier do
   alias ToyClan.Clan
 
   @callback message(Clan.player_id(), any()) :: any()
+  @callback clan_created(Clan.player_id(), Clan.clan_name()) :: any()
+  @callback players_list(Clan.player_id(), Clan.leader_id()) :: any()
   @callback invitation_request(Clan.player_id(), Clan.clan_name(), Clan.leader_id()) :: any()
+  @callback invitation_answer(Clan.player_id(), Clan.invitation_answer(), Clan.player_id()) :: any()
 
   @spec publish(Clan.player_id, Clan.player_event) :: :ok
   def publish(player_id, player_event), do:
@@ -32,7 +35,13 @@ defmodule ToyClan.PlayerNotifier do
 
   defp decode_event({:message, data}), do:
     {:message, [data]}
+  defp decode_event({:players_list, player_id}), do:
+    {:players_list, [player_id]}
+  defp decode_event({:clan_created, clan_name}), do:
+    {:clan_created, [clan_name]}
   defp decode_event({:invitation_request, clan_name, leader_id}), do:
     {:invitation_request, [clan_name, leader_id]}
+  defp decode_event({:invitation_answer, answer, player_id}), do:
+    {:invitation_answer, [answer, player_id]}
 
  end

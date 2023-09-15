@@ -15,6 +15,11 @@ defmodule ToyClan.ClanServer do
     {DynamicSupervisor, strategy: :one_for_one, name: @clans_supervisor}
   end
 
+  @spec players_list(Clan.clan_name(), Clan.player_id()) :: any()
+  def players_list(clan_name, player_id) do
+    GenServer.call(service_name(clan_name), {:players_list, player_id})
+  end
+
   @spec player_spec(Clan.player_id(), module()) :: player()
   def player_spec(player_id, callback_mod), do:
     %{id: player_id, callback_mod: callback_mod}
@@ -28,6 +33,11 @@ defmodule ToyClan.ClanServer do
   @spec invate_player(Clan.clan_name(), Clan.player_id()) :: any()
   def invate_player(clan_name, player_id) do
     GenServer.call(service_name(clan_name), {:invate_player, player_id})
+  end
+
+  @spec dismiss_player(Clan.clan_name(), Clan.player_id(), Clan.leader_id()) :: any()
+  def dismiss_player(clan_name, player_id, leader_id) do
+    GenServer.call(service_name(clan_name), {:dismiss_player, player_id, leader_id})
   end
 
   @spec invitation_answer(Clan.clan_name(), Clan.player_id(), Clan.invitation_answer()) :: any()
@@ -49,6 +59,15 @@ defmodule ToyClan.ClanServer do
   end
 
   @doc false
+  def handle_call({:players_list, player_id}, _from, state) do
+    {:reply, :ok,
+      state.clan
+      |> Clan.players_list(player_id)
+      |> handle_result(state)
+    }
+  end
+
+  @doc false
   def handle_call({:invate_player, player_id}, _from, state) do
     {:reply, :ok,
       state.clan
@@ -57,10 +76,20 @@ defmodule ToyClan.ClanServer do
     }
   end
 
+  @doc false
   def handle_call({:invitation_answer, player_id, answer}, _from, state) do
     {:reply, :ok,
       state.clan
       |> Clan.handle_invitation_answer(player_id,  answer)
+      |> handle_result(state)
+    }
+  end
+
+  @doc false
+  def handle_call({:dismiss_player, player_id, leader_id}, _from, state) do
+    {:reply, :ok,
+      state.clan
+      |> Clan.dismiss_player(player_id, leader_id)
       |> handle_result(state)
     }
   end

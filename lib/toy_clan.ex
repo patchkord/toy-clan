@@ -2,11 +2,9 @@ defmodule ToyClan do
   use Application
 
   def start(_type, _args) do
-    import Supervisor.Spec
-
     children =
       [
-        supervisor(Registry, [:unique, ToyClan.Registry]),
+        Supervisor.child_spec({Registry, [{:keys, :unique}, {:name,ToyClan.Registry}]}, []),
         ToyClan.ClanServer.child_spec()
       ]
 
