@@ -10,9 +10,9 @@ defmodule ToyClan.ClanServer do
 
   @clans_supervisor ToyClan.ClansSup
 
-  @spec child_spec() :: Supervisor.Spec.spec
+  @spec child_spec() :: Supervisor.child_spec()
   def child_spec() do
-    {DynamicSupervisor, strategy: :one_for_one, name: @clans_supervisor}
+    DynamicSupervisor.child_spec(strategy: :one_for_one, name: @clans_supervisor)
   end
 
   @spec players_list(Clan.clan_name(), Clan.player_id()) :: any()
